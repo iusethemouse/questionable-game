@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Game screen for individual users.</h1>
+
+    <p>Name: {{ current_user.name }}</p>
+
+    <div>
+        <a><button type="button" class="btn btn-outline-success">Ready</button></a>
+    </div>
+
+    <!-- {% if room.users %}
+        <h3>People who joined:</h3>
+        <table>
+            {% for user in room.users %}
+            <tr>
+                <p>{{ user.name }}</p>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>There is no one here yet.</p>
+    {% endif %} -->
+{% endblock %}
