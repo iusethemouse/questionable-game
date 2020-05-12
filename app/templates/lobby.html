@@ -4,26 +4,22 @@
     <h1>Room {{ room.name }}, {{ room.code }}</h1>
     <p>Share this link: <a href="{{ url_for('join', room_code=room.code) }}" >http://localhost:5000/join/{{ room.code }}</a></p>
     <hr>
-    <div>
-        <span id="user_list">A live user list should be here.</span>
+    <div id="scoreboard">
+        <table id='user_list' class='table table-sm'> 
+            <thead>
+                <tr>
+                    <th scope='col'>Player</th>
+                    <th scope='col'>Status</th>
+                    <th scope='col'>Score</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
+    <hr>
 
-    <div>
-        <p>TODO:</p>
-        <ul>
-            <li>Member list</li>
-            <li>When everyone is "ready", start the game:</li>
-            <li>
-                <ul>
-                    <li>X number of questions.</li>
-                    <li>1 minute for each question.</li>
-                    <li>All members but one get the same question, one member gets a slightly different one.</li>
-                    <li>At the end of each round, members' answers are displayed, people vote to select the impostor.</li>
-                    <li>Until either the impostor is discovered, or questions end, the game continues.</li>
-                    <li>At the end of the game, scores are calculated based on who people voted for.</li>
-                </ul>
-            </li>
-        </ul>
+    <div id="answerboard">
+        <p>Players' answers will be displayed here at the end of each round.</p>
     </div>
 
 {% endblock %}
@@ -31,7 +27,12 @@
 {% block app_script %}
     <script>
         $(function() {
-            setInterval(function() { refresh_users('{{ room.code }}', '#user_list'); }, 5000);
+            var user_refresh_id = setInterval(function() {
+                 refresh_users('{{ room.code }}', '#user_list'); 
+                 if (all_ready == true) {
+                    clearInterval(user_refresh_id);
+                    };
+                }, 5000);
         });
     </script>
 {% endblock %}

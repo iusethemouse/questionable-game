@@ -7,7 +7,7 @@
 {% block navbar %}
     <nav class="navbar navbar-default">
         <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
+
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
             <span class="sr-only">Toggle navigation</span>
@@ -15,17 +15,17 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Q&A</a>
+            <a class="navbar-brand" href="{{ url_for('index') }}">Questionable</a>
         </div>
     
-        <!-- Collect the nav links, forms, and other content for toggling -->
+
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
             <li><a href="{{ url_for('index') }}">Home</a></li>
             <li><a href="{{ url_for('about') }}">About</a></li>
             </ul>
-        </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
+        </div>
+        </div>
     </nav>
 {% endblock %}
 
@@ -34,7 +34,7 @@
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
+            <div id='flash_message' class="alert alert-info" role="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}
@@ -46,17 +46,52 @@
 
 {% block scripts %}
     {{ super() }}
-    
+
     <script>
+        var all_ready = false;
+
         function refresh_users(roomCode, destElem) {
             $.post('/refresh_users', {
                 code: roomCode
             }).done(function(response) {
-                $(destElem).text(response['users'])
+                var users = response['users'];
+                var users_ready = true;
+                // all_ready = response['all_ready'];
+                var table_start = "<table id='user_list' class='table table-sm'> \
+                                <thead> \
+                                    <tr> \
+                                        <th scope='col'>Player</th> \
+                                        <th scope='col'>Status</th> \
+                                        <th scope='col'>Score</th> \
+                                    </tr> \
+                                </thead> \
+                                <tbody>";
+                var table_end = "</tbody></table>";
+                var rows = "";
+                for (let name in users) {
+                    var status = users[name]['is_ready'];
+                    var score = users[name]['score'];
+                    var status_label = '';
+                    if (status == true){
+                        status_label = 'Ready';
+                    } else {
+                        status_label = 'Not ready';
+                        users_ready = false;
+                    }
+                    var row = "<tr><td>"+name+"</td><td>"+status_label+"</td><td>"+score+"</td></tr>";
+                    rows += row;
+                    all_ready = users_ready;
+                };
+                var table = table_start + rows + table_end;
+                $(destElem).replaceWith(table);
             }).fail(function() {
                 $(destElem).text("{{ 'Error: Could not contact server.' }}");
             });
         };
+
+        $(setInterval(function() {
+            $('#flash_message').remove()
+        }, 5000));
     </script>
 
     {% block app_script %}{% endblock %}

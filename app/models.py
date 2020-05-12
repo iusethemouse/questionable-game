@@ -34,6 +34,7 @@ class User(UserMixin, db.Model):
     room_id = db.Column(db.Integer, db.ForeignKey('room.id'))
     room = db.relationship('Room', backref=db.backref('users', lazy=True))
     is_ready = db.Column(db.Boolean, nullable=False)
+    score = db.Column(db.Integer)
 
     def __init__(self, name, room_code):
         r = Room.query.filter_by(code=room_code).first()
@@ -41,6 +42,7 @@ class User(UserMixin, db.Model):
         self.room = r
         self.name = name
         self.is_ready = False
+        self.score = 0
 
     def __repr__(self):
         return f'<User {self.name}>'

@@ -5,8 +5,8 @@
 
     <p>Name: {{ current_user.name }}</p>
 
-    <div>
-        <a><button type="button" class="btn btn-outline-success">Ready</button></a>
+    <div id="ready_button">
+        <a href="javascript:user_ready('{{ current_user.id }}', '#ready_button');"><button type="button" class="btn btn-primary">Ready</button></a>
     </div>
 
     <!-- {% if room.users %}
@@ -21,4 +21,20 @@
     {% else %}
         <p>There is no one here yet.</p>
     {% endif %} -->
+{% endblock %}
+
+{% block app_script %}
+        <script>
+            function user_ready(userId, buttonId) {
+                $.post('/user_ready', {
+                    user_id: userId
+                }).done(function(response) {
+                    var new_element = "<div id='user_question'> \
+                                        <p>Great, waiting for other players.</p></div>";
+                    $(buttonId).replaceWith(new_element);
+                }).fail(function() {
+                    $(buttonId).text("{{ 'Error: Could not contact server.' }}");
+                });
+            };
+        </script>
 {% endblock %}

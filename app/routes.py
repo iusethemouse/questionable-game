@@ -20,7 +20,7 @@ def index():
         return redirect(url_for('lobby', room_code=room.code))
     elif join_form.validate_on_submit():
         return redirect(url_for('join', room_code=join_form.room_code.data))
-    return render_template('index.html', title='Q&A', create_form=create_form, join_form=join_form)
+    return render_template('index.html', title='Questionable', create_form=create_form, join_form=join_form)
 
 
 @app.route('/lobby/<room_code>')
@@ -37,7 +37,7 @@ def join(room_code):
         user = User(name=new_user_form.name.data, room_code=room_code)
         db.session.commit()
         login_user(user)
-        flash(f"Joining {room.name}.")
+        flash(f"Joined {room.name}")
         return redirect(url_for('member_view', room_code=room.code))
     return render_template('join.html', title='Join room', room=room, form=new_user_form)
 
@@ -53,9 +53,21 @@ def refresh_users():
     room_code = request.form['code']
     room = Room.query.filter_by(code=room_code).first()
     users = {}
+    all_ready = True
     for user in room.users:
-        users[str(user.id)] = {'name': user.name, 'is_ready': user.is_ready}
-    return jsonify({'users': users})
+        users[user.name] = {'is_ready': user.is_ready, 'score': user.score}
+        if user.is_ready is False:
+            all_ready = False
+    return jsonify({'users': users, 'all_ready': all_ready})
+
+
+@app.route('/user_ready', methods=['POST'])
+def user_ready():
+    user_id = request.form['user_id']
+    user = User.query.get(int(user_id))
+    user.is_ready = True
+    db.session.commit()
+    return jsonify({})
 
 
 @app.route('/about')
