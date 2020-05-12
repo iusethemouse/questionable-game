@@ -26,11 +26,14 @@
 
 {% block app_script %}
     <script>
+        var ready_message = "<div id='answerboard'><p>Everyone is ready! Let's begin.</p></div>";
+
         $(function() {
             var user_refresh_id = setInterval(function() {
                  refresh_users('{{ room.code }}', '#user_list'); 
                  if (all_ready == true) {
                     clearInterval(user_refresh_id);
+                    $('#answerboard').replaceWith(ready_message)
                     };
                 }, 5000);
         });
